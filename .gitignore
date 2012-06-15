@@ -1,0 +1,6 @@
+bin
+obj
+*ReSharper*
+*.suo
+packages/*
+!packages/repositories.config
