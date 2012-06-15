@@ -8,13 +8,15 @@ using NUnit.Framework;
 
 namespace log4net
 {
+    internal class HttpRequestAppenderStub : HttpRequestAppender
+    {
+        protected override bool RequiresLayout { get { return false; } }
+    }
+
     [TestFixture]
     public class HttpRequestAppenderTests
     {
-        private Mock<HttpRequestAppender> _httpRequestAppenderMock;
         private HttpRequestAppender _httpRequestAppender;
-
-
         private CountingAppender _countingAppender;
         private Repository.Hierarchy.Hierarchy _hierarchy;
         private Mock<IContextManager> _contextManagerMock;
@@ -30,15 +32,13 @@ namespace log4net
             _contextManagerMock = new Mock<IContextManager>();
             var contextMock = new Mock<Context>(It.IsAny<object>());
             contextMock.SetupGet(c => c.Events)
-                   .Returns((GroupedEvents) null)
+                   .Returns((RenderedEvents) null)
                    .Verifiable();
             _contextManagerMock.Setup(c => c.BuildContext())
                                .Returns(contextMock.Object)
                                .Verifiable();
 
-            _httpRequestAppenderMock = new Mock<HttpRequestAppender> { CallBase = true };
-            _httpRequestAppenderMock.SetupGet(a => a.DoesRequireLayout).Returns(false).Verifiable();
-            _httpRequestAppender = _httpRequestAppenderMock.Object;
+            _httpRequestAppender = new HttpRequestAppenderStub();
             _httpRequestAppender.AddAppender(_countingAppender);
 
             _httpRequestAppender.ClearFilters();
@@ -60,8 +60,6 @@ namespace log4net
             Assert.AreEqual(1, _countingAppender.Counter);
         }
 
-        /// <summary>
-        /// </summary>
         [Test]
         public void TestBufferSize5()
         {

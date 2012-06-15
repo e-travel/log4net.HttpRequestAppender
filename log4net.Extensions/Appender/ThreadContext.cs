@@ -5,6 +5,10 @@ namespace log4net.Appender
 {
     public class ThreadContext : Context
     {
+        /// <summary>
+        /// Used to temporary store data during a thread execution
+        /// </summary>
+        /// <param name="dataSlot"></param>
         public ThreadContext(object dataSlot)
             : base(dataSlot)
         {
@@ -16,14 +20,14 @@ namespace log4net.Appender
             get { return _timeStamp; }
         }
 
-        public override GroupedEvents Events
+        public override RenderedEvents Events
         {
-            get { return log4net.ThreadContext.Properties["xaxa"] as GroupedEvents; }
+            get { return log4net.ThreadContext.Properties["xaxa"] as RenderedEvents; }
         }
 
-        public override void AddEvents(GroupedEvents groupedEvents)
+        public override void AddEvents(RenderedEvents renderedEvents)
         {
-            log4net.ThreadContext.Properties["xaxa"] = groupedEvents;
+            log4net.ThreadContext.Properties["xaxa"] = renderedEvents;
         }
 
         private readonly DateTime _timeStamp;

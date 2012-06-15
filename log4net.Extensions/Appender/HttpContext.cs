@@ -1,9 +1,11 @@
 ﻿using System;
-using System.Web;
 using log4net.Util;
 
 namespace log4net.Appender
 {
+    /// <summary>
+    /// Used to store temporary data during a http request
+    /// </summary>
     public class HttpContext : Context
     {
         public HttpContext(object dataSlot) 
@@ -15,18 +17,18 @@ namespace log4net.Appender
             get { return System.Web.HttpContext.Current.Timestamp; }
         }
 
-        public override GroupedEvents Events {
+        public override RenderedEvents Events {
             get
             {
                 return System.Web.HttpContext.Current.Items[DataSlot] != null
-                           ? System.Web.HttpContext.Current.Items[DataSlot] as GroupedEvents
+                           ? System.Web.HttpContext.Current.Items[DataSlot] as RenderedEvents
                            : null;
             }
         }
 
-        public override void AddEvents(GroupedEvents groupedEvents)
+        public override void AddEvents(RenderedEvents renderedEvents)
         {
-            System.Web.HttpContext.Current.Items[DataSlot] = groupedEvents;
+            System.Web.HttpContext.Current.Items[DataSlot] = renderedEvents;
         }
     }
 }

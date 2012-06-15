@@ -5,36 +5,29 @@ using log4net.Web;
 
 namespace log4net.Appender
 {
+    /// <summary>
+    /// Buffer logs during an HttpRequest and the forwards them to another appender as one log event
+    /// </summary>
     public class HttpRequestAppender : AppenderSkeleton, IAppenderAttachable
     {
-        private IContextManager _contextManager;
         public IContextManager ContextManager
         {
             set { _contextManager = value; }
-            private get { return _contextManager ?? (_contextManager = new ContextManager(dataSlot)); }
-        }
-        
-        private Context Context
-        {
-            get { return ContextManager.BuildContext(); }
+            private get { return _contextManager ?? (_contextManager = new ContextManager(_dataSlot)); }
         }
 
-        private readonly object dataSlot = new object();
-
-
-        public virtual bool DoesRequireLayout { get { return true; } }
-        protected override bool RequiresLayout { get { return DoesRequireLayout; } }
+        protected override bool RequiresLayout { get { return true; } }
 
         public override void ActivateOptions()
         {
             base.ActivateOptions();
 
-            Log4NetHttpModule.BeginRequest += this.OnBeginRequest;
-            Log4NetHttpModule.EndRequest += this.OnEndRequest;
+            Log4NetHttpModule.BeginRequest += OnBeginRequest;
+            Log4NetHttpModule.EndRequest += OnEndRequest;
 
             // we are in the context already, it's too late for OnBeginRequest to be called, so let's
             // just call it ourselves
-            this.OnBeginRequest(null, null);
+            OnBeginRequest(null, null);
         }
 
         #region HttpModule Events
@@ -55,17 +48,15 @@ namespace log4net.Appender
 
         #endregion HttpModule Events
 
-        protected GroupedEvents GetBuffer()
+        protected RenderedEvents GetBuffer()
         {
-            if (this.Context == null)
+            if (Context == null)
                 return null;
 
-            if (this.Context.Events == null)
-            {
-                this.Context.AddEvents(new GroupedEvents(this.Context.Timestamp, RenderLoggingEvent));
-            }
+            if (Context.Events == null)
+                Context.AddEvents(new RenderedEvents(this.Context.Timestamp, RenderLoggingEvent));
 
-            return this.Context.Events;
+            return Context.Events;
         }
 
         protected override void Append(LoggingEvent loggingEvent)
@@ -253,5 +244,12 @@ namespace log4net.Appender
         }
 
         #endregion Implementation of IAppenderAttachable
+
+        private Context Context
+        {
+            get { return ContextManager.BuildContext(); }
+        }
+        private IContextManager _contextManager;
+        private readonly object _dataSlot = new object();
     }
 }

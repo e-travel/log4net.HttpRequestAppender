@@ -1,7 +1,8 @@
-﻿using System.Web;
-
-namespace log4net.Appender
+﻿namespace log4net.Appender
 {
+    /// <summary>
+    /// Context manager is used to decide what type of context the appender is using (http, thread or mock)
+    /// </summary>
     public class ContextManager : IContextManager
     {
         private readonly object _dataSlot;
@@ -17,9 +18,10 @@ namespace log4net.Appender
                        ? null
                        : new HttpContext(_dataSlot);
 
-            return System.Web.HttpContext.Current == null
+            // note: de-comment in v1.1
+            /*return System.Web.HttpContext.Current == null
                        ? (Context)new ThreadContext(_dataSlot)
-                       : new HttpContext(_dataSlot);
+                       : new HttpContext(_dataSlot);*/
         }
     }
 }

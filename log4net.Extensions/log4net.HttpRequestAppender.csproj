@@ -49,7 +49,7 @@
     <Compile Include="Appender\IContextManager.cs" />
     <Compile Include="Appender\ThreadContext.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Util\GroupedEvents.cs" />
+    <Compile Include="Util\RenderedEvents.cs" />
     <Compile Include="Web\Log4NetHttpModule.cs" />
   </ItemGroup>
   <ItemGroup>

@@ -1,11 +1,10 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Text;
 using log4net.Core;
 
 namespace log4net.Util
 {
-    public class GroupedEvents
+    public class RenderedEvents
     {
         public delegate string Renderer(LoggingEvent logEvent);
 
@@ -17,7 +16,7 @@ namespace log4net.Util
 
         public bool IsEmpty { get { return Buffer.Length == 0; } }
 
-        public GroupedEvents(DateTime requestStart,Renderer renderer)
+        public RenderedEvents(DateTime requestStart,Renderer renderer)
         {
             _firstEvent = new LoggingEventData
                               {
@@ -30,7 +29,7 @@ namespace log4net.Util
 
         public void AddEvent(LoggingEvent logEvent)
         {
-            this.Buffer.Append(_renderer(logEvent));
+            Buffer.Append(_renderer(logEvent));
         }
 
 
@@ -38,7 +37,7 @@ namespace log4net.Util
         {
             var duration = (DateTime.Now - _firstEvent.TimeStamp).TotalMilliseconds;
             duration = Math.Truncate(duration);
-            _firstEvent.Message = duration + "ms" + this.Buffer;
+            _firstEvent.Message = duration + "ms" + Buffer;
             return new LoggingEvent(_firstEvent);
         }
     }
