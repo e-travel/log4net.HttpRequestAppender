@@ -1,14 +1,14 @@
 ﻿using log4net.Appender;
 using log4net.Config;
 using log4net.Core;
-using log4net.Tests.Appender;
+using log4net.HttpRequestAppender.Tests.Unit.Appender;
 using log4net.Util;
 using Moq;
 using NUnit.Framework;
 
-namespace log4net
+namespace log4net.HttpRequestAppender.Tests.Unit
 {
-    internal class HttpRequestAppenderStub : HttpRequestAppender
+    internal class HttpRequestAppenderStub : log4net.Appender.HttpRequestAppender
     {
         protected override bool RequiresLayout { get { return false; } }
     }
@@ -16,7 +16,7 @@ namespace log4net
     [TestFixture]
     public class HttpRequestAppenderTests
     {
-        private HttpRequestAppender _httpRequestAppender;
+        private log4net.Appender.HttpRequestAppender _httpRequestAppender;
         private CountingAppender _countingAppender;
         private Repository.Hierarchy.Hierarchy _hierarchy;
         private Mock<IContextManager> _contextManagerMock;

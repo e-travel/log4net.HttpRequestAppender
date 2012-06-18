@@ -8,7 +8,7 @@
     <ProjectGuid>{E0A6E136-CE83-4CD8-AE26-81E602042F07}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>log4net</RootNamespace>
+    <RootNamespace>log4net.HttpRequestAppender.Tests.Unit</RootNamespace>
     <AssemblyName>log4net.HttpRequestAppender.Tests.Unit</AssemblyName>
     <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
@@ -33,11 +33,9 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="log4net">
-      <HintPath>..\libs\log4net-1.2.11\log4net.dll</HintPath>
-    </Reference>
-    <Reference Include="log4net.Tests">
-      <HintPath>..\libs\log4net-1.2.11\log4net.Tests.dll</HintPath>
+    <Reference Include="log4net, Version=1.2.11.0, Culture=neutral, PublicKeyToken=669e0ddf0bb1aa2a, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\packages\log4net.2.0.0\lib\net40-full\log4net.dll</HintPath>
     </Reference>
     <Reference Include="Moq">
       <HintPath>..\packages\Moq.4.0.10827\lib\NET40\Moq.dll</HintPath>
@@ -46,9 +44,11 @@
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\packages\NUnit.2.6.0.12054\lib\nunit.framework.dll</HintPath>
     </Reference>
+    <Reference Include="System" />
     <Reference Include="System.Core" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Appender\CountingAppender.cs" />
     <Compile Include="HttpRequestAppenderTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
@@ -56,7 +56,7 @@
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\log4net.Extensions\log4net.HttpRequestAppender.csproj">
+    <ProjectReference Include="..\log4net.HttpRequestAppender\log4net.HttpRequestAppender.csproj">
       <Project>{A6EF26C0-C421-49A5-9507-8BA0DA7DBD72}</Project>
       <Name>log4net.HttpRequestAppender</Name>
     </ProjectReference>

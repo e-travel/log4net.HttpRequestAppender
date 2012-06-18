@@ -3,7 +3,7 @@ Microsoft Visual Studio Solution File, Format Version 11.00
 # Visual Studio 2010
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TestWebSite", "TestWebSite\TestWebSite.csproj", "{76757C68-F2A7-4A95-B6BD-915C13E88473}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "log4net.HttpRequestAppender", "log4net.Extensions\log4net.HttpRequestAppender.csproj", "{A6EF26C0-C421-49A5-9507-8BA0DA7DBD72}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "log4net.HttpRequestAppender", "log4net.HttpRequestAppender\log4net.HttpRequestAppender.csproj", "{A6EF26C0-C421-49A5-9507-8BA0DA7DBD72}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "log4net.HttpRequestAppender.Tests.Unit", "log4net.HttpRequestAppender.Tests.Unit\log4net.HttpRequestAppender.Tests.Unit.csproj", "{E0A6E136-CE83-4CD8-AE26-81E602042F07}"
 EndProject
