@@ -2,5 +2,6 @@ bin
 obj
 *ReSharper*
 *.suo
+*.dotCover
 packages/*
 !packages/repositories.config
