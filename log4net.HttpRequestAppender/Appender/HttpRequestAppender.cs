@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Web;
 using log4net.Core;
 using log4net.Util;
 using log4net.Web;
@@ -10,24 +11,13 @@ namespace log4net.Appender
     /// </summary>
     public class HttpRequestAppender : AppenderSkeleton, IAppenderAttachable
     {
-        public IContextManager ContextManager
-        {
-            set { _contextManager = value; }
-            private get { return _contextManager ?? (_contextManager = new ContextManager(_dataSlot)); }
-        }
-
         protected override bool RequiresLayout { get { return true; } }
 
         public override void ActivateOptions()
         {
             base.ActivateOptions();
 
-            Log4NetHttpModule.BeginRequest += OnBeginRequest;
             Log4NetHttpModule.EndRequest += OnEndRequest;
-
-            // we are in the context already, it's too late for OnBeginRequest to be called, so let's
-            // just call it ourselves
-            OnBeginRequest(null, null);
         }
 
         #region HttpModule Events
@@ -37,55 +27,81 @@ namespace log4net.Appender
             if (buffer == null || buffer.IsEmpty)
                 return;
 
-            SendBuffer( new []{buffer.GetEvent()});
-        }
+            // Ok, we got the buffer, prepare the event.
+            var context = GetHttpContext();
+            var duration = DateTime.Now - context.Timestamp;
 
-        private void OnBeginRequest(object sender, EventArgs e)
-        {
-            //var context = HttpContext.Current;
-            //context.Items[this.dataSlot] = null;
+            var logEvent = new LoggingEvent(new LoggingEventData
+                                                {
+                                                    Level = Level.Info,
+                                                    Message =
+                                                        duration.TotalMilliseconds + "ms" + buffer.GetRenderedEvents()
+                                                });
+
+            SendBuffer(logEvent);
         }
 
         #endregion HttpModule Events
 
-        protected RenderedEvents GetBuffer()
+        protected SimpleRenderedEventBuffer GetOrCreateBuffer()
         {
-            if (Context == null)
+            var buffer = GetBuffer();
+
+            if (buffer != null)
+                return buffer;
+
+            var context = GetHttpContext();
+            if (context == null)
                 return null;
 
-            if (Context.Events == null)
-                Context.AddEvents(new RenderedEvents(this.Context.Timestamp, RenderLoggingEvent));
+            buffer = new SimpleRenderedEventBuffer(RenderLoggingEvent);
+            context.Items[this._dataSlot] = buffer;
+            return buffer;
+        }
 
-            return Context.Events;
+        protected SimpleRenderedEventBuffer GetBuffer()
+        {
+            var context = GetHttpContext();
+            if (context == null)
+                return null;
+            return context.Items[this._dataSlot] as SimpleRenderedEventBuffer;
+        }
+
+        protected virtual HttpContextBase GetHttpContext()
+        {
+            var context = HttpContext.Current;
+            if (context == null)
+                return null;
+            return new HttpContextWrapper(HttpContext.Current);
         }
 
         protected override void Append(LoggingEvent loggingEvent)
         {
-            var buffer = GetBuffer();
+            var buffer = GetOrCreateBuffer();
             if (buffer == null)
-                SendBuffer(new []{loggingEvent});
+                SendBuffer(loggingEvent);
             else
                 buffer.AddEvent(loggingEvent);
         }
 
-        #region klopy of BufferingAppenderSkeleton
+        #region got it from NLog BufferingAppenderSkeleton
 
         /// <summary>
         /// Send the events.
         /// </summary>
-        /// <param name="events">The events that need to be send.</param>
+        /// <param name="logEvent">The events that need to be send.</param>
         /// <remarks>
         /// <para>
         /// Forwards the events to the attached appenders.
         /// </para>
         /// </remarks>
         /// 
-        protected void SendBuffer(LoggingEvent[] events)
+        protected void SendBuffer(LoggingEvent logEvent)
         {
             // Pass the logging event on to the attached appenders
             if (m_appenderAttachedImpl != null)
             {
-                m_appenderAttachedImpl.AppendLoopOnAppenders(events);
+                m_appenderAttachedImpl.AppendLoopOnAppenders(logEvent);
             }
         }
 
@@ -245,11 +261,6 @@ namespace log4net.Appender
 
         #endregion Implementation of IAppenderAttachable
 
-        private Context Context
-        {
-            get { return ContextManager.BuildContext(); }
-        }
-        private IContextManager _contextManager;
         private readonly object _dataSlot = new object();
     }
 }

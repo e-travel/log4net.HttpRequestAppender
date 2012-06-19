@@ -1,9 +1,6 @@
-﻿using log4net.Appender;
-using log4net.Config;
+﻿using log4net.Config;
 using log4net.Core;
 using log4net.HttpRequestAppender.Tests.Unit.Appender;
-using log4net.Util;
-using Moq;
 using NUnit.Framework;
 
 namespace log4net.HttpRequestAppender.Tests.Unit
@@ -19,7 +16,6 @@ namespace log4net.HttpRequestAppender.Tests.Unit
         private log4net.Appender.HttpRequestAppender _httpRequestAppender;
         private CountingAppender _countingAppender;
         private Repository.Hierarchy.Hierarchy _hierarchy;
-        private Mock<IContextManager> _contextManagerMock;
 
         [SetUp]
         public void SetupRepository()
@@ -28,15 +24,6 @@ namespace log4net.HttpRequestAppender.Tests.Unit
 
             _countingAppender = new CountingAppender();
             _countingAppender.ActivateOptions();
-
-            _contextManagerMock = new Mock<IContextManager>();
-            var contextMock = new Mock<Context>(It.IsAny<object>());
-            contextMock.SetupGet(c => c.Events)
-                   .Returns((RenderedEvents) null)
-                   .Verifiable();
-            _contextManagerMock.Setup(c => c.BuildContext())
-                               .Returns(contextMock.Object)
-                               .Verifiable();
 
             _httpRequestAppender = new HttpRequestAppenderStub();
             _httpRequestAppender.AddAppender(_countingAppender);
