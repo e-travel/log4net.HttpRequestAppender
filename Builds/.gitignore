@@ -1,0 +1,6 @@
+obj/
+bin/
+*_ReSharper*
+*.user
+*.suo
+/solutions/_ReSharper.*
