@@ -44,7 +44,7 @@
   <ItemGroup>
     <Compile Include="Appender\HttpRequestAppender.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Util\RenderedEvents.cs" />
+    <Compile Include="Util\SimpleRenderedEventBuffer.cs" />
     <Compile Include="Web\Log4NetHttpModule.cs" />
   </ItemGroup>
   <ItemGroup>
