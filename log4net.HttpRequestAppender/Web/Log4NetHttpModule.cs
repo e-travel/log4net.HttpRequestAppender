@@ -26,8 +26,8 @@
         /// </param>
         public void Init(HttpApplication application)
         {
-            application.BeginRequest += BeginRequestHandler;
-            application.EndRequest += EndRequestHandler;
+            application.BeginRequest += this.BeginRequestHandler;
+            application.EndRequest += this.EndRequestHandler;
         }
 
         /// <summary>
