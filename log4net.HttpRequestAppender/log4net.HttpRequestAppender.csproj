@@ -49,6 +49,7 @@
     <Compile Include="Web\Log4NetHttpModule.cs" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="log4net.HttpRequestAppender.nuspec" />
     <None Include="packages.config" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
