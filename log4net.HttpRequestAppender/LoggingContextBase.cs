@@ -15,7 +15,7 @@ namespace log4net
             }
             else
             {
-                LogicalThreadContext.Properties[key] = value ?? string.Empty;
+                LogicalThreadContext.Properties[key] = value;
             }
         }
 
