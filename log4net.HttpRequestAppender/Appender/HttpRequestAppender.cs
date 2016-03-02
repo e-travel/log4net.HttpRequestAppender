@@ -49,7 +49,7 @@ namespace log4net.Appender
             var logEvent = new LoggingEvent(new LoggingEventData
                                                 {
                                                     Level = Level.Info,
-                                                    Message = duration.TotalMilliseconds + "ms" + buffer.GetRenderedEvents()
+                                                    Message = duration.TotalMilliseconds.ToString("F0") + "ms" + buffer.GetRenderedEvents()
                                                 });
 
             #endregion
