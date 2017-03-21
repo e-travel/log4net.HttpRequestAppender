@@ -33,9 +33,9 @@ namespace log4net.Appender
 
             var logEvent = new LoggingEvent(new LoggingEventData
                                                 {
+                                                    TimeStamp = buffer.TimeStamp ?? default(DateTime),
                                                     Level = Level.Info,
-                                                    Message =
-                                                        duration.TotalMilliseconds + "ms" + buffer.GetRenderedEvents()
+                                                    Message = duration.TotalMilliseconds + "ms" + buffer.GetRenderedEvents()
                                                 });
 
             SendBuffer(logEvent);
