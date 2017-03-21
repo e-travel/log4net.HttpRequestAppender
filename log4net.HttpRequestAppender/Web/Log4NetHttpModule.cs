@@ -26,8 +26,8 @@
         /// </param>
         public void Init(HttpApplication application)
         {
-            application.BeginRequest += this.BeginRequestHandler;
-            application.EndRequest += this.EndRequestHandler;
+            application.BeginRequest += BeginRequestHandler;
+            application.EndRequest += EndRequestHandler;
         }
 
         /// <summary>
@@ -37,7 +37,7 @@
         {
         }
 
-        private void BeginRequestHandler(object sender, EventArgs args)
+        private static void BeginRequestHandler(object sender, EventArgs args)
         {
             if (BeginRequest != null)
             {
@@ -45,7 +45,7 @@
             }
         }
 
-        private void EndRequestHandler(object sender, EventArgs args)
+        private static void EndRequestHandler(object sender, EventArgs args)
         {
             if (EndRequest != null)
             {
