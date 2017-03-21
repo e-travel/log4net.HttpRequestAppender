@@ -1,7 +1,7 @@
 ﻿using System.Text;
 using log4net.Core;
 
-namespace log4net.Appender
+namespace log4net.Util
 {
     public class SimpleRenderedEventBuffer
     {

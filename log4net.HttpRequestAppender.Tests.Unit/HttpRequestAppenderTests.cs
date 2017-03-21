@@ -1,9 +1,9 @@
 ﻿using log4net.Config;
 using log4net.Core;
-using log4net.Layout;
+using log4net.HttpRequestAppender.Tests.Unit.Appender;
 using NUnit.Framework;
 
-namespace log4net.HttpRequestAppender.Tests.Unit.Appender
+namespace log4net.HttpRequestAppender.Tests.Unit
 {
     internal class HttpRequestAppenderStub : log4net.Appender.HttpRequestAppender
     {
@@ -30,7 +30,6 @@ namespace log4net.HttpRequestAppender.Tests.Unit.Appender
 
             _httpRequestAppender.ClearFilters();
             _httpRequestAppender.Threshold = Level.All;
-            _httpRequestAppender.Layout = new SimpleLayout();
 
             _httpRequestAppender.ActivateOptions();
 

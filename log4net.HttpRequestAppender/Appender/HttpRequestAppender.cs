@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Concurrent;
 using System.Web;
 using log4net.Core;
 using log4net.Util;
@@ -21,24 +20,10 @@ namespace log4net.Appender
             Log4NetHttpModule.EndRequest += OnEndRequest;
         }
 
+        #region HttpModule Events
         private void OnEndRequest(object sender, EventArgs e)
         {
-            #region set logging properties from httpcontext to callcontext
-
-            var httpContextBuffer = GetHttpContextBuffer(false);
-            if (httpContextBuffer != null)
-            {
-                foreach (var element in httpContextBuffer)
-                {
-                    LogicalThreadContext.Properties[element.Key] = element.Value;
-                }
-            }
-
-            #endregion
-
-            #region create one large logging event from multiple appended smaller events
-
-            var buffer = GetBuffer(false, _dataSlot, () => new SimpleRenderedEventBuffer(RenderLoggingEvent));
+            var buffer = GetBuffer();
             if (buffer == null || buffer.IsEmpty)
                 return;
 
@@ -49,39 +34,40 @@ namespace log4net.Appender
             var logEvent = new LoggingEvent(new LoggingEventData
                                                 {
                                                     Level = Level.Info,
-                                                    Message = duration.TotalMilliseconds.ToString("F0") + "ms" + buffer.GetRenderedEvents()
+                                                    Message =
+                                                        duration.TotalMilliseconds + "ms" + buffer.GetRenderedEvents()
                                                 });
-
-            #endregion
 
             SendBuffer(logEvent);
         }
 
-        private static T GetBuffer<T>(bool create, object dataSlot, Func<T> creator)
-            where T : class
+        #endregion HttpModule Events
+
+        protected SimpleRenderedEventBuffer GetOrCreateBuffer()
         {
+            var buffer = GetBuffer();
+
+            if (buffer != null)
+                return buffer;
+
             var context = GetHttpContext();
             if (context == null)
-            {
                 return null;
-            }
-            var buffer = context.Items[dataSlot] as T;
 
-            if (buffer == null && create)
-            {
-                buffer = creator();
-                context.Items[dataSlot] = buffer;
-            }
-
+            buffer = new SimpleRenderedEventBuffer(RenderLoggingEvent);
+            context.Items[this._dataSlot] = buffer;
             return buffer;
         }
 
-        public static ConcurrentDictionary<string, string> GetHttpContextBuffer(bool create)
+        protected SimpleRenderedEventBuffer GetBuffer()
         {
-            return GetBuffer(create, LoggingPropertiesBufferKey, () => new ConcurrentDictionary<string, string>());
+            var context = GetHttpContext();
+            if (context == null)
+                return null;
+            return context.Items[this._dataSlot] as SimpleRenderedEventBuffer;
         }
 
-        private static HttpContextBase GetHttpContext()
+        protected virtual HttpContextBase GetHttpContext()
         {
             var context = HttpContext.Current;
             if (context == null)
@@ -91,20 +77,14 @@ namespace log4net.Appender
 
         protected override void Append(LoggingEvent loggingEvent)
         {
-            var buffer = GetBuffer(true, _dataSlot, () => new SimpleRenderedEventBuffer(RenderLoggingEvent));
+            var buffer = GetOrCreateBuffer();
             if (buffer == null)
-            {
-                SendBuffer(new LoggingEvent(new LoggingEventData
-                                                {
-                                                    Level = Level.Info,
-                                                    Message = RenderLoggingEvent(loggingEvent)
-                                                }));
-            }
+                SendBuffer(loggingEvent);
             else
-            {
                 buffer.AddEvent(loggingEvent);
-            }
         }
+
+        #region got it from NLog BufferingAppenderSkeleton
 
         /// <summary>
         /// Send the events.
@@ -116,21 +96,23 @@ namespace log4net.Appender
         /// </para>
         /// </remarks>
         /// 
-        private void SendBuffer(LoggingEvent logEvent)
+        protected void SendBuffer(LoggingEvent logEvent)
         {
             // Pass the logging event on to the attached appenders
-            if (_mAppenderAttachedImpl != null)
+            if (m_appenderAttachedImpl != null)
             {
-                _mAppenderAttachedImpl.AppendLoopOnAppenders(logEvent);
+                m_appenderAttachedImpl.AppendLoopOnAppenders(logEvent);
             }
         }
+
+        #endregion klopy of BufferingAppenderSkeleton
 
         #region Implementation of IAppenderAttachable
 
         /// <summary>
         /// Implementation of the <see cref="IAppenderAttachable"/> interface
         /// </summary>
-        private AppenderAttachedImpl _mAppenderAttachedImpl;
+        private AppenderAttachedImpl m_appenderAttachedImpl;
 
         /// <summary>
         /// Adds an <see cref="IAppender" /> to the list of appenders of this
@@ -143,7 +125,7 @@ namespace log4net.Appender
         /// appenders, then it won't be added again.
         /// </para>
         /// </remarks>
-        public virtual void AddAppender(IAppender newAppender)
+        virtual public void AddAppender(IAppender newAppender)
         {
             if (newAppender == null)
             {
@@ -151,11 +133,11 @@ namespace log4net.Appender
             }
             lock (this)
             {
-                if (_mAppenderAttachedImpl == null)
+                if (m_appenderAttachedImpl == null)
                 {
-                    _mAppenderAttachedImpl = new AppenderAttachedImpl();
+                    m_appenderAttachedImpl = new log4net.Util.AppenderAttachedImpl();
                 }
-                _mAppenderAttachedImpl.AddAppender(newAppender);
+                m_appenderAttachedImpl.AddAppender(newAppender);
             }
         }
 
@@ -170,19 +152,19 @@ namespace log4net.Appender
         /// <returns>
         /// A collection of the appenders in this appender.
         /// </returns>
-        public virtual AppenderCollection Appenders
+        virtual public AppenderCollection Appenders
         {
             get
             {
                 lock (this)
                 {
-                    if (_mAppenderAttachedImpl == null)
+                    if (m_appenderAttachedImpl == null)
                     {
                         return AppenderCollection.EmptyCollection;
                     }
                     else
                     {
-                        return _mAppenderAttachedImpl.Appenders;
+                        return m_appenderAttachedImpl.Appenders;
                     }
                 }
             }
@@ -200,16 +182,16 @@ namespace log4net.Appender
         /// Get the named appender attached to this buffering appender.
         /// </para>
         /// </remarks>
-        public virtual IAppender GetAppender(string name)
+        virtual public IAppender GetAppender(string name)
         {
             lock (this)
             {
-                if (_mAppenderAttachedImpl == null || name == null)
+                if (m_appenderAttachedImpl == null || name == null)
                 {
                     return null;
                 }
 
-                return _mAppenderAttachedImpl.GetAppender(name);
+                return m_appenderAttachedImpl.GetAppender(name);
             }
         }
 
@@ -221,14 +203,14 @@ namespace log4net.Appender
         /// This is useful when re-reading configuration information.
         /// </para>
         /// </remarks>
-        public virtual void RemoveAllAppenders()
+        virtual public void RemoveAllAppenders()
         {
             lock (this)
             {
-                if (_mAppenderAttachedImpl != null)
+                if (m_appenderAttachedImpl != null)
                 {
-                    _mAppenderAttachedImpl.RemoveAllAppenders();
-                    _mAppenderAttachedImpl = null;
+                    m_appenderAttachedImpl.RemoveAllAppenders();
+                    m_appenderAttachedImpl = null;
                 }
             }
         }
@@ -243,13 +225,13 @@ namespace log4net.Appender
         /// If you are discarding the appender you must call
         /// <see cref="IAppender.Close"/> on the appender removed.
         /// </remarks>
-        public virtual IAppender RemoveAppender(IAppender appender)
+        virtual public IAppender RemoveAppender(IAppender appender)
         {
             lock (this)
             {
-                if (appender != null && _mAppenderAttachedImpl != null)
+                if (appender != null && m_appenderAttachedImpl != null)
                 {
-                    return _mAppenderAttachedImpl.RemoveAppender(appender);
+                    return m_appenderAttachedImpl.RemoveAppender(appender);
                 }
             }
             return null;
@@ -265,13 +247,13 @@ namespace log4net.Appender
         /// If you are discarding the appender you must call
         /// <see cref="IAppender.Close"/> on the appender removed.
         /// </remarks>
-        public virtual IAppender RemoveAppender(string name)
+        virtual public IAppender RemoveAppender(string name)
         {
             lock (this)
             {
-                if (name != null && _mAppenderAttachedImpl != null)
+                if (name != null && m_appenderAttachedImpl != null)
                 {
-                    return _mAppenderAttachedImpl.RemoveAppender(name);
+                    return m_appenderAttachedImpl.RemoveAppender(name);
                 }
             }
             return null;
@@ -280,6 +262,5 @@ namespace log4net.Appender
         #endregion Implementation of IAppenderAttachable
 
         private readonly object _dataSlot = new object();
-        private const string LoggingPropertiesBufferKey = "logging_properties_buffer";
     }
 }
