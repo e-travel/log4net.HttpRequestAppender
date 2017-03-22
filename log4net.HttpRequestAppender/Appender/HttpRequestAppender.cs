@@ -97,6 +97,7 @@ namespace log4net.Appender
             {
                 SendBuffer(new LoggingEvent(new LoggingEventData
                 {
+                    TimeStamp = loggingEvent.TimeStamp,
                     Level = Level.Info,
                     Message = RenderLoggingEvent(loggingEvent)
                 }));
