@@ -1,17 +1,20 @@
 <?xml version="1.0"?>
 <package xmlns="http://schemas.microsoft.com/packaging/2010/07/nuspec.xsd">
-<metadata>
-  <id>$id$</id>
-  <version>$version$</version>
-  <authors>E-Travel</authors>
-  <owners>E-Travel</owners>
-  <licenseUrl>http://www.pamediakopes.gr/misc/termsofuse</licenseUrl>
-  <projectUrl>https://github.com/e-travel/log4net.HttpRequestAppender</projectUrl>
-  <iconUrl>http://www.pamediakopes.gr/template/img/favicon.ico</iconUrl>
-  <requireLicenseAcceptance>false</requireLicenseAcceptance>
-  <description>Log4net appender that buffer logs during an HttpRequest and the forwards them to another appender as one log event. </description>
-  <tags>log4net.HttpRequestAppender</tags>
-</metadata>
+  <metadata>
+    <id>$id$</id>
+    <version>$version$</version>
+    <authors>E-Travel</authors>
+    <owners>E-Travel</owners>
+    <licenseUrl>http://www.pamediakopes.gr/misc/termsofuse</licenseUrl>
+    <projectUrl>https://github.com/e-travel/log4net.HttpRequestAppender</projectUrl>
+    <iconUrl>http://www.pamediakopes.gr/template/img/favicon.ico</iconUrl>
+    <requireLicenseAcceptance>false</requireLicenseAcceptance>
+    <description>Log4net appender that buffer logs during an HttpRequest and the forwards them to another appender as one log event. </description>
+    <tags>log4net.HttpRequestAppender</tags>
+    <dependencies>
+      <dependency id="log4net" version="2.0.3" />
+    </dependencies>
+  </metadata>
   <files>
     <file src="bin\Release\log4net.HttpRequestAppender.dll" target="lib"/>
   </files>
